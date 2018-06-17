@@ -1,0 +1,66 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Write your model definitions here
+ */
+
+namespace org.fanniemae.loan
+
+abstract participant Business identified by businessName {
+  o String businessName
+  o String lenderMarkingId
+}
+
+participant GSE extends Business {
+}
+
+participant Servicer extends Business {
+}
+
+enum OnBoardingStatus {
+  o PROPOSED
+  o UNDER_REVIEW
+  o ACCPTED
+  o REJECTED
+}
+
+transaction RecordPayment { 
+  o Double principalAndInterest
+  o DateTime postedDate
+  --> Loan loan
+}
+
+transaction AcceptLoan {
+  --> Loan loan
+}
+
+transaction RejectLoan {
+  --> Loan loan
+}
+
+asset Loan identified by loanId {
+  o String loanId
+  o OnBoardingStatus onBoardingStatus
+  o String propertyAddress
+  o String propertyValue
+  o Double originalLoanAmount
+  o Double unPaidBalance
+  o Double loanRate
+  o RecordPayment[] payments
+  --> Servicer servicer
+}
+
+transaction InitialSetup {
+}
