@@ -60,7 +60,7 @@ async function recordPayment(recordPayment) {
 * @transaction
 */
 
-async function initialDemo(initialDemo) {
+async function initialSetup(initialSetup) {
   const factory = new getFactory();
   const namespace = 'org.fanniemae.loan';
 
@@ -71,15 +71,15 @@ async function initialDemo(initialDemo) {
   const wellsFargoServicer = factory.newResource(namespace, 'Servicer', 'WellsFargo');
   wellsFargoServicer.lenderMarkingId = 'WellsFargoMarketingID';
 
-  const servicerRegistry = facotry.getParticipantRegistry(namespace + '.Servicer');
-  servicerRegistry.addAll([chaseServicer, wellsFargoServicer]);
+  const servicerRegistry = await getParticipantRegistry(namespace + '.Servicer');
+  await servicerRegistry.addAll([chaseServicer, wellsFargoServicer]);
 
   // Add GSE
-  const fannieMae = factory.getResource(namespace, 'GSE', 'FannieMae');
+  const fannieMae = factory.newResource(namespace, 'GSE', 'FannieMae');
   fannieMae.lenderMarkingId = 'FannieMaeMarketingID';
   
-  const gseRegistry = factory.getParticipantRegistry(namespace + '.GSE');
-  gseRegistry.addAll([gseRegistry]);
+  const gseRegistry = await getParticipantRegistry(namespace + '.GSE');
+  await gseRegistry.addAll([fannieMae]);
 
   // Add Loan
   const loan = factory.newResource(namespace, 'Loan', 'LOAN01');
@@ -89,8 +89,8 @@ async function initialDemo(initialDemo) {
   loan.originalLoanAmount = 100000;
   loan.unPaidBalance = 100000;
   loan.loanRate = 0.2;
-  loan.servicer = factory.newRelationShip(namespace,'Servicer','Chase');
+  loan.servicer = factory.newRelationship(namespace,'Servicer','Chase');
  
-  const loanRegistry = factory.getParticipantRegistry(namespace + '.Loan');
-  loanRegistry.addAll([loan]);
+  const loanRegistry = await getAssetRegistry(namespace + '.Loan');
+  await loanRegistry.addAll([loan]);
 }

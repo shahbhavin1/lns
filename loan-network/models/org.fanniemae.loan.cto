@@ -54,11 +54,11 @@ asset Loan identified by loanId {
   o String loanId
   o OnBoardingStatus onBoardingStatus
   o String propertyAddress
-  o String propertyValue
+  o Double propertyValue
   o Double originalLoanAmount
   o Double unPaidBalance
   o Double loanRate
-  o RecordPayment[] payments
+  o RecordPayment[] payments optional
   --> Servicer servicer
 }
 
