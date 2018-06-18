@@ -16,10 +16,19 @@
 
  /**
   * Accept the loan from servicer
-  * @param {org.fanniemae.loan.AcceptLoan} acceptLoan
+  * @param {org.fanniemae.loan.InsertLoan} insertLoan
   * @transaction
   */
- async function acceptLoan(acceptLoan) {
+ async function insertLoan(insertLoan) {
+  console.log(insertLoan.loan);
+}
+
+/**
+* Accept the loan from servicer
+* @param {org.fanniemae.loan.AcceptLoan} acceptLoan
+* @transaction
+*/
+async function acceptLoan(acceptLoan) {
   console.log(acceptLoan);
   const loan = acceptLoan.loan;
   loan.onBoardingStatus = 'ACCPTED';
@@ -88,9 +97,45 @@ async function initialSetup(initialSetup) {
   loan.propertyValue = 123456;
   loan.originalLoanAmount = 100000;
   loan.unPaidBalance = 100000;
-  loan.loanRate = 0.2;
+  loan.loanRate = 3.8;
   loan.servicer = factory.newRelationship(namespace,'Servicer','Chase');
+  
+  const loan2 = factory.newResource(namespace, 'Loan', 'LOAN02');
+  loan2.onBoardingStatus = 'PROPOSED';
+  loan2.propertyAddress = '1234 EFGJ Dr, Dallas, TX - 72341';
+  loan2.propertyValue = 789876;
+  loan2.originalLoanAmount = 600000;
+  loan2.unPaidBalance = 600000;
+  loan2.loanRate = 4.2;
+  loan2.servicer = factory.newRelationship(namespace,'Servicer','WellsFargo');
  
   const loanRegistry = await getAssetRegistry(namespace + '.Loan');
-  await loanRegistry.addAll([loan]);
+  await loanRegistry.addAll([loan, loan2]);
 }
+
+/*
+* @param {org.fanniemae.loan.TearDownAll} tearDownAll
+* @transaction
+*/
+
+ async function tearDownAll(tearDownAll) {
+   const namespace = 'org.fanniemae.loan';
+   //Remove All Loans
+   const loanRegistry = await getAssetRegistry(namespace + '.Loan');
+   const loans = await loanRegistry.getAll();
+   loans.forEach(function(loan) {
+     loanRegistry.remove(loan);
+   });
+   //Remove all Servicers
+   const servicerRegistry = await getParticipantRegistry(namespace + '.Servicer');
+   const servicers = await servicerRegistry.getAll();
+   servicers.forEach(function(servicer) {
+     servicerRegistry.remove(servicer);
+   });
+   //Remove all GSEs
+   const gseRegistry = await getParticipantRegistry(namespace + '.GSE');
+   const gses = await gseRegistry.getAll();
+   gses.forEach(function(gse) {
+     gseRegistry.remove(gse);
+   });
+ }
