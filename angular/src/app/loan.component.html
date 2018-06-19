@@ -1,0 +1,31 @@
+<body *ngIf = "loan">
+<div class ="page">
+<div class="header"></div>
+<!--<input style = "margin-left: 20px" type="file" name="photo" ng2FileSelect [uploader]="uploader" />
+<button class = "button" (click) = "uploader.uploadAll()"
+  [disabled]="!uploader.getNotUploadedItems().length" >Upload xml File</button>
+-->
+<input  style = "margin-left: 20px" id = "file-upload"  type = "file" accept = ".xml" (change) = "fileUpload($event)" />
+<table class="loan-overview" href="javascript:void(0)" (click) = "getLoanDetails()">
+<tr>
+<td>Loan ID: {{loan.loanId}}</td>
+</tr>
+<tr>
+<td>Loan Rate:{{loan.loanRate}} %</td>
+</tr>
+<tr>
+<td>On Board Status: {{loan.onBoardingStatus}}</td>
+</tr>
+<tr>
+<td>Original Loan Amount: ${{loan.originalLoanAmount}}</td>
+</tr>
+<tr>
+<td>Property Address: {{loan.propertyAddress}}</td>
+</tr>
+<tr>
+<td>Property Value: ${{loan.propertyValue}}</td>
+</tr>
+</table>
+</div>
+</body>
+
