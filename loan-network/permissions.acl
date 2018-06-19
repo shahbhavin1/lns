@@ -11,6 +11,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+rule DefaultServicer {
+	description: "Grant all participant access to everything"
+  	participant: "org.fanniemae.loan.Servicer"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
+rule DefaultGSE {
+	description: "Grant all participant access to everything"
+  	participant: "org.fanniemae.loan.GSE"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
+rule ServicerLoanAccess {
+	description: "Grant all participant access to everything"
+  	participant(p): "org.fanniemae.loan.Servicer"
+    operation: ALL
+    resource(r): "org.fanniemae.loan.**"
+    condition: (p.getIdentifier() == r.servicer.getIdentifier())
+    action: ALLOW
+}
+
+rule GSELoanAccess {
+	description: "Grant all participant access to everything"
+  	participant: "org.fanniemae.loan.GSE"
+    operation: ALL
+    resource: "org.fanniemae.loan.**"
+    action: ALLOW
+}
+
+rule ServicerReportPayment {
+	description: "Grant all participant access to everything"
+  	participant: "org.fanniemae.loan.Servicer"
+    operation: ALL
+    resource: "org.fanniemae.loan.RecordPayment"
+    action: ALLOW
+}
 
 rule NetworkAdminUser {
     description: "Grant business network administrators full access to user resources"

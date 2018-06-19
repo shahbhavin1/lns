@@ -66,8 +66,14 @@ asset Loan identified by loanId {
   --> Servicer servicer
 }
 
-transaction InitialSetup {
+transaction InsertInitialParticipant {
 }
 
-transaction TearDownAll {
+transaction InsertInitialBulkLoans {
+}
+
+transaction DeleteInitialBulkLoans {
+}
+
+transaction DeleteInitialParticipant {
 }

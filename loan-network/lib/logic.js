@@ -64,68 +64,41 @@ async function recordPayment(recordPayment) {
   await loanRegistry.update(loan);
 }
 
-/*
-* @param {org.fanniemae.loan.InitialSetup} initialSetup
-* @transaction
+/* Insert initial Participant for ease of testing.
+*  @param {org.fanniemae.loan.InsertInitialParticipant} insertInitialParticipant
+*  @transaction
 */
-
-async function initialSetup(initialSetup) {
+async function insertInitialParticipant(insertInitialParticipant) {
   const factory = new getFactory();
   const namespace = 'org.fanniemae.loan';
-
+  
   // Add servicers
   const chaseServicer = factory.newResource(namespace, 'Servicer', 'Chase');
   chaseServicer.lenderMarkingId = 'ChaseMarketingID';
 
   const wellsFargoServicer = factory.newResource(namespace, 'Servicer', 'WellsFargo');
   wellsFargoServicer.lenderMarkingId = 'WellsFargoMarketingID';
+  
+  const boaServicer = factory.newResource(namespace, 'Servicer', 'BoA');
+  boaServicer.lenderMarkingId = 'BoAMarketingID';
 
   const servicerRegistry = await getParticipantRegistry(namespace + '.Servicer');
-  await servicerRegistry.addAll([chaseServicer, wellsFargoServicer]);
+  await servicerRegistry.addAll([chaseServicer, wellsFargoServicer, boaServicer]);
 
   // Add GSE
   const fannieMae = factory.newResource(namespace, 'GSE', 'FannieMae');
   fannieMae.lenderMarkingId = 'FannieMaeMarketingID';
   
   const gseRegistry = await getParticipantRegistry(namespace + '.GSE');
-  await gseRegistry.addAll([fannieMae]);
-
-  // Add Loan
-  const loan = factory.newResource(namespace, 'Loan', 'LOAN01');
-  loan.onBoardingStatus = 'PROPOSED';
-  loan.propertyAddress = '1234 ABCD Dr, Dallas, TX - 72341';
-  loan.propertyValue = 123456;
-  loan.originalLoanAmount = 100000;
-  loan.unPaidBalance = 100000;
-  loan.loanRate = 3.8;
-  loan.servicer = factory.newRelationship(namespace,'Servicer','Chase');
-  
-  const loan2 = factory.newResource(namespace, 'Loan', 'LOAN02');
-  loan2.onBoardingStatus = 'PROPOSED';
-  loan2.propertyAddress = '1234 EFGJ Dr, Dallas, TX - 72341';
-  loan2.propertyValue = 789876;
-  loan2.originalLoanAmount = 600000;
-  loan2.unPaidBalance = 600000;
-  loan2.loanRate = 4.2;
-  loan2.servicer = factory.newRelationship(namespace,'Servicer','WellsFargo');
- 
-  const loanRegistry = await getAssetRegistry(namespace + '.Loan');
-  await loanRegistry.addAll([loan, loan2]);
+  await gseRegistry.addAll([fannieMae]);    
 }
 
-/*
-* @param {org.fanniemae.loan.TearDownAll} tearDownAll
+/* Delete initial participants for ease of testing.
+* @param {org.fanniemae.loan.DeleteInitialParticipant} deleteInitialParticipant
 * @transaction
 */
-
- async function tearDownAll(tearDownAll) {
+async function deleteInitialParticipant(deleteInitialParticipant) {
    const namespace = 'org.fanniemae.loan';
-   //Remove All Loans
-   const loanRegistry = await getAssetRegistry(namespace + '.Loan');
-   const loans = await loanRegistry.getAll();
-   loans.forEach(function(loan) {
-     loanRegistry.remove(loan);
-   });
    //Remove all Servicers
    const servicerRegistry = await getParticipantRegistry(namespace + '.Servicer');
    const servicers = await servicerRegistry.getAll();
@@ -137,5 +110,86 @@ async function initialSetup(initialSetup) {
    const gses = await gseRegistry.getAll();
    gses.forEach(function(gse) {
      gseRegistry.remove(gse);
+   });
+}
+
+/* Insert initial Loans for ease of testing.
+* @param {org.fanniemae.loan.InsertInitialBulkLoans} insertInitialBulkLoans
+* @transaction
+*/
+async function insertInitialBulkLoans(insertInitialBulkLoans) {
+  const factory = new getFactory();
+  const namespace = 'org.fanniemae.loan';
+
+  // Add Loans
+  const jloan = factory.newResource(namespace, 'Loan', 'jpm01');
+  jloan.onBoardingStatus = 'PROPOSED';
+  jloan.propertyAddress = '1111 Chambray Dr, Dallas, TX - 72341';
+  jloan.propertyValue = 123456;
+  jloan.originalLoanAmount = 100000;
+  jloan.unPaidBalance = 100000;
+  jloan.loanRate = 3.5;
+  jloan.servicer = factory.newRelationship(namespace,'Servicer','Chase');
+  
+  const jloan2 = factory.newResource(namespace, 'Loan', 'jpm02');
+  jloan2.onBoardingStatus = 'PROPOSED';
+  jloan2.propertyAddress = '2222 Capital Ave, Dallas, TX - 72341';
+  jloan2.propertyValue = 234567;
+  jloan2.originalLoanAmount = 200000;
+  jloan2.unPaidBalance = 200000;
+  jloan2.loanRate = 3.6;
+  jloan2.servicer = factory.newRelationship(namespace,'Servicer','Chase');
+  
+  const wloan1 = factory.newResource(namespace, 'Loan', 'wells01');
+  wloan1.onBoardingStatus = 'PROPOSED';
+  wloan1.propertyAddress = '1111 Washington St, Paris, TX - 72341';
+  wloan1.propertyValue = 175000;
+  wloan1.originalLoanAmount = 150000;
+  wloan1.unPaidBalance = 150000;
+  wloan1.loanRate = 2.2;
+  wloan1.servicer = factory.newRelationship(namespace,'Servicer','WellsFargo');
+  
+  const wloan2 = factory.newResource(namespace, 'Loan', 'wells02');
+  wloan2.onBoardingStatus = 'PROPOSED';
+  wloan2.propertyAddress = '2222 Festive St, Dallas, TX - 72341';
+  wloan2.propertyValue = 275000;
+  wloan2.originalLoanAmount = 250000;
+  wloan2.unPaidBalance = 250000;
+  wloan2.loanRate = 4.2;
+  wloan2.servicer = factory.newRelationship(namespace,'Servicer','WellsFargo');
+  
+  const boa1 = factory.newResource(namespace, 'Loan', 'boa01');
+  boa1.onBoardingStatus = 'PROPOSED';
+  boa1.propertyAddress = '1111 Beach St, Dallas, TX - 72341';
+  boa1.propertyValue = 195000;
+  boa1.originalLoanAmount = 190000;
+  boa1.unPaidBalance = 190000;
+  boa1.loanRate = 4.8;
+  boa1.servicer = factory.newRelationship(namespace,'Servicer','BoA');
+  
+  const boa2 = factory.newResource(namespace, 'Loan', 'boa02');
+  boa2.onBoardingStatus = 'PROPOSED';
+  boa2.propertyAddress = '2222 Bassett Ave, Dallas, TX - 72341';
+  boa2.propertyValue = 295000;
+  boa2.originalLoanAmount = 245000;
+  boa2.unPaidBalance = 245000;
+  boa2.loanRate = 3.2;
+  boa2.servicer = factory.newRelationship(namespace,'Servicer','BoA');
+ 
+  const loanRegistry = await getAssetRegistry(namespace + '.Loan');
+  await loanRegistry.addAll([jloan, jloan2, wloan1, wloan2, boa1, boa2]);
+}
+
+/* Delete all loans for ease of testing
+* @param {org.fanniemae.loan.DeleteInitialBulkLoans} deleteInitialBulkLoans
+* @transaction
+*/
+ async function DeleteInitialBulkLoans(DeleteInitialBulkLoans) {
+   const namespace = 'org.fanniemae.loan';
+   //Remove All Loans
+   const loanRegistry = await getAssetRegistry(namespace + '.Loan');
+   const loans = await loanRegistry.getAll();
+   loans.forEach(function(loan) {
+     loanRegistry.remove(loan);
    });
  }
