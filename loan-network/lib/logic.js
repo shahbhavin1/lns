@@ -31,7 +31,7 @@
 async function acceptLoan(acceptLoan) {
   console.log(acceptLoan);
   const loan = acceptLoan.loan;
-  loan.onBoardingStatus = 'ACCPTED';
+  loan.onBoardingStatus = 'ACCEPTED';
   const loanRegistry = await getAssetRegistry('org.fanniemae.loan.Loan');
   await loanRegistry.update(loan);
 }
@@ -56,10 +56,14 @@ async function rejectLoan(rejectLoan) {
 async function recordPayment(recordPayment) {
   console.log(recordPayment);
   const loan = recordPayment.loan;
-  if (loan.payments)
+  if (loan.onBoardingStatus != 'ACCEPTED') {
+    throw new Error('Can not submit payment for non accepted Loan');
+  }
+  if (loan.payments) {
     loan.payments.push(recordPayment);
-  else
-      loan.payments = [recordPayment];
+  } else {
+       loan.payments = [recordPayment];
+  }
   const loanRegistry = await getAssetRegistry('org.fanniemae.loan.Loan');
   await loanRegistry.update(loan);
 }

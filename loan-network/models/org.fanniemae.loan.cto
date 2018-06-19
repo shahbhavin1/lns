@@ -32,7 +32,7 @@ participant Servicer extends Business {
 enum OnBoardingStatus {
   o PROPOSED
   o UNDER_REVIEW
-  o ACCPTED
+  o ACCEPTED
   o REJECTED
 }
 
