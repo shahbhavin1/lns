@@ -50,6 +50,8 @@ transaction RejectLoan {
 
 transaction RecordPayment { 
   o Double principalAndInterest
+  o Double originalUPB optional
+  o Double newUPB optional
   o DateTime postedDate
   --> Loan loan
 }
@@ -62,6 +64,10 @@ asset Loan identified by loanId {
   o Double originalLoanAmount
   o Double unPaidBalance
   o Double loanRate
+  o Double expectedInterest optional
+  o Double expectedPrincipal optional
+  o Double monthlyFixedInstallment optional
+  o Double remainingTerm optional
   o RecordPayment[] payments optional
   --> Servicer servicer
 }

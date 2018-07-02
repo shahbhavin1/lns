@@ -31,8 +31,19 @@
 async function acceptLoan(acceptLoan) {
   console.log(acceptLoan);
   const loan = acceptLoan.loan;
-  loan.onBoardingStatus = 'ACCEPTED';
   const loanRegistry = await getAssetRegistry('org.fanniemae.loan.Loan');
+  const i = loan.loanRate / (100 * 12);
+  console.log ("first value = " + 1000*i);
+  console.log ("second value = " + (1 - (1 / (i+1))^360));
+  const P = (1000 * i) / (1-Math.pow(1/(i+1),360));
+  console.log (" i = " + i + " P = " + P);
+  loan.monthlyFixedInstallment = loan.originalLoanAmount * P / 1000;
+  console.log("Monthly Fixed Installment = " + loan.monthlyFixedInstallment);
+  loan.remainingTerm = 360;
+  loan.expectedInterest = i * loan.unPaidBalance;
+  loan.expectedPrincipal = loan.monthlyFixedInstallment - loan.expectedInterest;  
+  loan.onBoardingStatus = 'ACCEPTED';
+  loan.remainingTerm--;
   await loanRegistry.update(loan);
 }
 
@@ -59,6 +70,15 @@ async function recordPayment(recordPayment) {
   if (loan.onBoardingStatus != 'ACCEPTED') {
     throw new Error('Can not submit payment for non accepted Loan');
   }
+
+  const i  = loan.loanRate / (100 * 12);
+  const I = loan.unPaidBalance * i;
+ // const P = loan.monthlyFixedInstallment - I;
+  const P = recordPayment.principalAndInterest - I;
+  recordPayment.originalUPB = loan.unPaidBalance;
+  loan.unPaidBalance = loan.unPaidBalance - P;
+  recordPayment.newUPB = loan.unPaidBalance;
+  console.log("recordPayment: i " + i + "I = " + I + "P = " + P + "UPB = " + loan.unPaidBalance);
   if (loan.payments) {
     loan.payments.push(recordPayment);
   } else {
